@@ -16,6 +16,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.ktorm:ktorm-core:3.6.0")
+    implementation("mysql:mysql-connector-java:8.0.30")
     testImplementation(kotlin("test"))
 }
 
