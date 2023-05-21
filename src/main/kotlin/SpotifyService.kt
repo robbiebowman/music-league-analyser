@@ -7,12 +7,23 @@ import java.net.URI
 
 
 object SpotifyService {
-    fun getSongDetails(songUri: String): Pair<Track, Artist> {
-        val songId = songUri.split(':').last()
-        val spotifyApi: SpotifyApi = SpotifyApi.Builder()
+
+    private val spotifyApi = buildSpotifyApi()
+
+    private fun buildSpotifyApi(): SpotifyApi {
+        val api = SpotifyApi.Builder()
+            .setClientId(Env.spotifyClientId)
+            .setClientSecret(Env.spotifyClientSecret)
             .setAccessToken(Env.spotifyAccessToken)
             .setRefreshToken(Env.spotifyRefreshToken)
             .build()
+        val accessToken = api.authorizationCodeRefresh().build().execute().accessToken
+        api.accessToken = accessToken
+        return api
+    }
+
+    fun getSongDetails(songUri: String): Pair<Track, Artist> {
+        val songId = songUri.split(':').last()
 
         val track = spotifyApi.getTrack(songId)
             .market(CountryCode.US)
@@ -22,5 +33,9 @@ object SpotifyService {
             .build().execute()
 
         return Pair(track, artist)
+    }
+
+    fun createUserPlaylist(userId: String) {
+        spotifyApi.createPlaylist("123", "testabc").build().execute()
     }
 }
