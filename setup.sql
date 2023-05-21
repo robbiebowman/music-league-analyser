@@ -2,6 +2,9 @@ drop table if exists users;
 drop table if exists votes;
 drop table if exists submissions;
 drop table if exists rounds;
+drop table if exists songs;
+drop table if exists artists;
+drop table if exists artists_genres;
 
 create table users (
 	id varchar(255) not null,
@@ -29,3 +32,24 @@ create table rounds (
 	description mediumtext,
 	playlist_uri varchar(255) not null
 );
+
+create table songs (
+	spotify_uri varchar(255) not null,
+	name varchar(255) not null,
+	artist_id varchar(255) not null,
+	duration_ms int not null,
+	popularity_num int not null
+);
+
+create table artists (
+	id varchar(255) not null,
+	spotify_uri varchar(255) not null,
+	name varchar(255) not null,
+	popularity_num int not null
+);
+
+create table artists_genres (
+	artist_id varchar(255) not null,
+	name varchar(255) not null
+);
+
