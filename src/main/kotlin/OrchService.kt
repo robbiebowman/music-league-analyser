@@ -2,14 +2,14 @@ import models.Sentiment
 
 object OrchService {
 
-    fun populateDatabase() {
+    fun populateDatabase(musicLeagueId: String = Env.musicLeagueId) {
         val rounds = MusicLeagueService.getRounds(
             Env.musicLeagueToken,
-            Env.musicLeagueId
+            musicLeagueId
         )
         val roundResults =
-            rounds.associateWith { MusicLeagueService.getResults(Env.musicLeagueToken, Env.musicLeagueId, it.id) }
-        val members = MusicLeagueService.getMembers(Env.musicLeagueToken, Env.musicLeagueId).map { it.user }
+            rounds.associateWith { MusicLeagueService.getResults(Env.musicLeagueToken, musicLeagueId, it.id) }
+        val members = MusicLeagueService.getMembers(Env.musicLeagueToken, musicLeagueId).map { it.user }
 
         SqlService.insertEverything(members, roundResults)
     }
