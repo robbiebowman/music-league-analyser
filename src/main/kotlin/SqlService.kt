@@ -80,12 +80,22 @@ object SqlService {
         return query.map { row -> row[Submissions.spotify_uri] }.filterNotNull()
     }
 
+    fun getSongsUserCommentedOn(musicLeagueUserId: String): List<SongComment> {
+        val query = database.from(Submissions)
+            .innerJoin(Votes, on = Votes.submission_id eq Submissions.id)
+            .select()
+            .where((Votes.user_id eq musicLeagueUserId) and (Votes.comment.isNotNull()) and (Votes.comment notEq ""))
+
+        return query.map { row -> SongComment(row[Submissions.spotify_uri]!!, row[Votes.comment]!!) }
+    }
+
     fun getUsers(): List<SqlService.User> {
         return database.from(Users)
             .select().map { row -> User(row[Users.id]!!, row[Users.name]!!) }
     }
 
     data class User(val id: String, val name: String)
+    data class SongComment(val spotifyUri: String, val comment: String)
 
     object Users : Table<Nothing>("users") {
         val id = varchar("id")

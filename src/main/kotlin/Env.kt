@@ -5,6 +5,5 @@ object Env {
     val musicLeagueId = env.get("league_id")!!
     val spotifyClientId = env.get("spotify_client_id")!!
     val spotifyClientSecret = env.get("spotify_client_secret")!!
-    val spotifyAccessToken = env.get("spotify_access_token")!!
-    val spotifyRefreshToken = env.get("spotify_refresh_token")!!
+    val openaiApiKey = env.get("openai_api_key")!!
 }

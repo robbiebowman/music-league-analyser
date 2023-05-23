@@ -49,8 +49,12 @@ object SpotifyService {
 
     fun createUserPlaylist(playlistName: String, musicLeagueUserId: String) {
         val songIds = SqlService.getSongsUserVotedFor(musicLeagueUserId).shuffled()
+        createPlaylist(playlistName, songIds)
+    }
+
+    fun createPlaylist(playlistName: String, songUris: List<String>) {
         val userId = spotifyApi.currentUsersProfile.build().execute().id
         val playlist = spotifyApi.createPlaylist(userId, playlistName).build().execute()
-        spotifyApi.addItemsToPlaylist(playlist.id, songIds.toTypedArray()).build().execute()
+        if (songUris.isNotEmpty()) spotifyApi.addItemsToPlaylist(playlist.id, songUris.toTypedArray()).build().execute()
     }
 }
