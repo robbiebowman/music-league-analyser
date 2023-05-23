@@ -2,22 +2,34 @@ import com.neovisionaries.i18n.CountryCode
 import se.michaelthelin.spotify.SpotifyApi
 import se.michaelthelin.spotify.model_objects.specification.Artist
 import se.michaelthelin.spotify.model_objects.specification.Track
-import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest
 import java.net.URI
 
 
 object SpotifyService {
 
-    private val spotifyApi = buildSpotifyApi()
+    private val spotifyApi = buildUserAgentSpotifyApi()
 
-    private fun buildSpotifyApi(): SpotifyApi {
+    private fun buildReadOnlySpotifyApi(): SpotifyApi {
         val api = SpotifyApi.Builder()
             .setClientId(Env.spotifyClientId)
             .setClientSecret(Env.spotifyClientSecret)
-            .setAccessToken(Env.spotifyAccessToken)
-            .setRefreshToken(Env.spotifyRefreshToken)
             .build()
-        val accessToken = api.authorizationCodeRefresh().build().execute().accessToken
+        val accessToken = api.clientCredentials().build().execute().accessToken
+        api.accessToken = accessToken
+        return api
+    }
+
+    private fun buildUserAgentSpotifyApi(): SpotifyApi {
+        val api = SpotifyApi.Builder()
+            .setClientId(Env.spotifyClientId)
+            .setClientSecret(Env.spotifyClientSecret)
+            .setRedirectUri(URI("http://localhost/spotify_redirect"))
+            .build()
+        val uri = api.authorizationCodeUri().scope("playlist-modify-public").build().execute()
+        println(uri)
+        println("Paste the code from the redirect URL after you authorise:")
+        val code = readLine()!!
+        val accessToken = api.authorizationCode(code).build().execute().accessToken
         api.accessToken = accessToken
         return api
     }
@@ -35,7 +47,10 @@ object SpotifyService {
         return Pair(track, artist)
     }
 
-    fun createUserPlaylist(userId: String) {
-        spotifyApi.createPlaylist("123", "testabc").build().execute()
+    fun createUserPlaylist(playlistName: String, musicLeagueUserId: String) {
+        val songIds = SqlService.getSongsUserVotedFor(musicLeagueUserId).shuffled()
+        val userId = spotifyApi.currentUsersProfile.build().execute().id
+        val playlist = spotifyApi.createPlaylist(userId, playlistName).build().execute()
+        spotifyApi.addItemsToPlaylist(playlist.id, songIds.toTypedArray()).build().execute()
     }
 }

@@ -2,16 +2,17 @@ import models.Round
 import models.Standing
 import models.User
 import org.ktorm.database.Database
-import org.ktorm.dsl.insert
+import org.ktorm.dsl.*
 import org.ktorm.schema.*
 
 object SqlService {
-    fun insertEverything(members: List<User>, roundResults: Map<Round, List<Standing>>) {
-        val database = Database.connect(
-            "jdbc:mysql://localhost:3306/db",
-            driver = "com.mysql.jdbc.Driver", user = "root", password = "root"
-        )
 
+    private val database = Database.connect(
+        "jdbc:mysql://localhost:3306/db",
+        driver = "com.mysql.jdbc.Driver", user = "root", password = "root"
+    )
+
+    fun insertEverything(members: List<models.User>, roundResults: Map<Round, List<Standing>>) {
         members.forEach { m ->
             database.insert(Users) {
                 set(it.id, m.id)
@@ -69,6 +70,22 @@ object SqlService {
             }
         }
     }
+
+    fun getSongsUserVotedFor(musicLeagueUserId: String): List<String> {
+        val query = database.from(Submissions)
+            .innerJoin(Votes, on = Votes.submission_id eq Submissions.id)
+            .select()
+            .where((Votes.user_id eq musicLeagueUserId) and (Votes.weight greater 0))
+
+        return query.map { row -> row[Submissions.spotify_uri] }.filterNotNull()
+    }
+
+    fun getUsers(): List<SqlService.User> {
+        return database.from(Users)
+            .select().map { row -> User(row[Users.id]!!, row[Users.name]!!) }
+    }
+
+    data class User(val id: String, val name: String)
 
     object Users : Table<Nothing>("users") {
         val id = varchar("id")
