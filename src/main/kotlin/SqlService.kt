@@ -34,6 +34,7 @@ object SqlService {
                 set(it.name, r.name)
                 set(it.description, r.description)
                 set(it.playlist_uri, r.playlistUrl)
+                set(it.league_id, r.leagueId)
                 onDuplicateKey{
                     set(it.name, r.name)
                     set(it.description, r.description)
@@ -150,6 +151,7 @@ object SqlService {
         val name = varchar("name")
         val description = varchar("description")
         val playlist_uri = varchar("playlist_uri")
+        val league_id = varchar("league_id")
     }
 
     object Songs : Table<Nothing>("songs") {

@@ -31,6 +31,7 @@ object SpotifyService {
         val code = readLine()!!
         val accessToken = api.authorizationCode(code).build().execute().accessToken
         api.accessToken = accessToken
+        println("Authorisation success! Beginning job...")
         return api
     }
 

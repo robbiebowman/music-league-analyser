@@ -34,6 +34,7 @@ create table rounds (
 	name varchar(255) not null,
 	description mediumtext,
 	playlist_uri varchar(255) not null,
+	league_id varchar(255) not null,
 	primary key (id)
 );
 
@@ -59,4 +60,3 @@ create table artists_genres (
 	name varchar(255) not null,
 	primary key (artist_id, name)
 );
-
